@@ -34,12 +34,39 @@
 
 package com.yourcompany.android.jetpackcompose.screens
 
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.RadioButton
+import androidx.compose.material.RadioButtonDefaults
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.yourcompany.android.jetpackcompose.MainActivity
+import com.yourcompany.android.jetpackcompose.R
 import com.yourcompany.android.jetpackcompose.router.BackButtonHandler
 import com.yourcompany.android.jetpackcompose.router.JetFundamentalsRouter
 import com.yourcompany.android.jetpackcompose.router.Screen
@@ -52,7 +79,7 @@ fun ExploreButtonsScreen() {
 
     MyButton()
     MyRadioGroup()
-    MyFloatingActionButton()
+    MyFloatingActionButton(Modifier.align(Alignment.End).padding(end = 16.dp))
 
     BackButtonHandler {
       JetFundamentalsRouter.navigateTo(Screen.Navigation)
@@ -61,16 +88,80 @@ fun ExploreButtonsScreen() {
 }
 
 @Composable
+@Preview
 fun MyButton() {
-  //TODO add your code here
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        onClick = {
+            MainActivity.context?.let {
+                Toast.makeText(it, "Button clicked!", Toast.LENGTH_SHORT).show()
+            }
+        },
+        colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.colorPrimary)),
+        border = BorderStroke(1.dp, color = colorResource(id = R.color.colorPrimaryDark))
+    ) {
+        Text(text = stringResource(id = R.string.button_text), color = Color.White)
+    }
 }
 
 @Composable
+@Preview
 fun MyRadioGroup() {
-  //TODO add your code here
+    val radioButtons = listOf(0, 1, 2)
+    val label = listOf("First", "Second", "Third")
+    val selectedButton = remember { mutableStateOf(radioButtons.first()) }
+
+    Column {
+        radioButtons.forEach { index ->
+            val isSelected = index == selectedButton.value
+            val colors = RadioButtonDefaults.colors(
+                selectedColor = colorResource(id = R.color.colorPrimary),
+                unselectedColor = colorResource(id = R.color.colorPrimaryDark),
+                disabledColor = Color.LightGray
+            )
+            val textColor = if (isSelected) colorResource(id = R.color.colorPrimary) else Color.Black
+            val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+
+            Row(
+                Modifier.clickable(interactionSource = MutableInteractionSource(), indication = null) {
+                    selectedButton.value = index
+                    MainActivity.context?.let {
+                        Toast.makeText(it, "${label[index]} selected", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    colors = colors,
+                    selected = isSelected,
+                    onClick = {
+                        selectedButton.value = index
+                        MainActivity.context?.let {
+                            Toast.makeText(it, "${label[index]} selected", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+                Text(text = label[index], color = textColor, fontWeight = fontWeight)
+            }
+        }
+    }
 }
 
 @Composable
-fun MyFloatingActionButton() {
-  //TODO add your code here
+fun MyFloatingActionButton(modifier: Modifier) {
+    FloatingActionButton(
+        modifier = modifier,
+        onClick = {
+            MainActivity.context?.let {
+                Toast.makeText(it, "Fab clicked!", Toast.LENGTH_SHORT).show()
+            }
+        },
+        backgroundColor = colorResource(id = R.color.colorPrimary),
+        contentColor = Color.White
+    ) {
+        Icon(Icons.Filled.Favorite, contentDescription = "Test FAB")
+    }
 }

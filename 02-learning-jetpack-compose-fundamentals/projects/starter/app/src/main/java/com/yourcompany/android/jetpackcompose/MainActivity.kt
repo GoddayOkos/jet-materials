@@ -34,19 +34,49 @@
 
 package com.yourcompany.android.jetpackcompose
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.mutableStateOf
 import com.yourcompany.android.jetpackcompose.app.JetFundamentalsApp
 
 class MainActivity : AppCompatActivity() {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    setTheme(R.style.AppTheme)
-    super.onCreate(savedInstanceState)
+    private val state = mutableStateOf("")
 
-    setContent {
-      JetFundamentalsApp()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
+        super.onCreate(savedInstanceState)
+
+        context = this
+        savedInstanceState?.let {
+            state.value = it.getString(TEXT_VALUE_STATE, "")
+        }
+
+        setContent {
+            JetFundamentalsApp(state)
+        }
     }
-  }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(TEXT_VALUE_STATE, state.value)
+    }
+
+    override fun onDestroy() {
+        context = null
+        super.onDestroy()
+    }
+
+    companion object {
+        private const val TEXT_VALUE_STATE = "text_value_state"
+
+        // TODO: This is a bad practice!!, just for educational purpose only
+        @SuppressLint("StaticFieldLeak")
+        var context: Context? = null
+            private set
+    }
+
 }
